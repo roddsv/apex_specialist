@@ -1,0 +1,16 @@
+public with sharing class MaintenanceRequestHelper {
+    public static void updateworkOrders(List<Case> updWorkOrders, Map<Id,Case> nonUpdCaseMap) {
+        Set<Id> validIds = new Set<Id>();
+        
+        
+        // Listing all Repair and Routine Maintenance cases
+        For (Case c : updWorkOrders){
+            if (nonUpdCaseMap.get(c.Id).Status != 'Closed' && c.Status == 'Closed'){
+                if (c.Type == 'Repair' || c.Type == 'Routine Maintenance'){
+                    validIds.add(c.Id);
+                      
+                }
+            }
+        }
+    }
+}
