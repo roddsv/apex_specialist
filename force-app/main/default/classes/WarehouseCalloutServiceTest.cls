@@ -1,5 +1,6 @@
-@IsTest
-private class WarehouseCalloutServiceTest {
+@isTest
+
+private class WarehouseCalloutServiceTest {   
     @isTest  
     static void testWareHouseCallout(){
         Test.startTest();
@@ -8,5 +9,6 @@ private class WarehouseCalloutServiceTest {
         WarehouseCalloutService.runWarehouseEquipmentSync();
         Test.stopTest();
         System.assertEquals(1, [SELECT count() FROM Product2]);
-    }  
+    }     
 }
+
