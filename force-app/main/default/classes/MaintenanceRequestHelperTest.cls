@@ -107,4 +107,48 @@ public with sharing class MaintenanceRequestHelperTest {
         system.assert(workPart != null);
         system.assert(allRequest.size() == 1);
     }
+
+    @istest
+    private static void testMaintenanceRequestBulk(){
+        list<Vehicle__C> vehicleList = new list<Vehicle__C>();
+        list<Product2> equipmentList = new list<Product2>();
+        list<Equipment_Maintenance_Item__c> workPartList = new list<Equipment_Maintenance_Item__c>();
+        list<case> requestList = new list<case>();
+        list<id> oldRequestIds = new list<id>();
+        
+        for(integer i = 0; i < 300; i++){
+           vehicleList.add(createVehicle());
+            equipmentList.add(createEq());
+        }
+        insert vehicleList;
+        insert equipmentList;
+        
+        for(integer i = 0; i < 300; i++){
+            requestList.add(createMaintenanceRequest(vehicleList.get(i).id, equipmentList.get(i).id));
+        }
+        insert requestList;
+        
+        for(integer i = 0; i < 300; i++){
+            workPartList.add(createWorkPart(equipmentList.get(i).id, requestList.get(i).id));
+        }
+        insert workPartList;
+        
+        test.startTest();
+        for(case req : requestList){
+            req.Status = CLOSED;
+            oldRequestIds.add(req.Id);
+        }
+        update requestList;
+        test.stopTest();
+        
+        list<case> allRequests = [select id
+                                 from case
+                                 where status =: STATUS_NEW];
+        
+        list<Equipment_Maintenance_Item__c> workParts = [select id
+                                                        from Equipment_Maintenance_Item__c
+                                                        where Maintenance_Request__c in: oldRequestIds];
+        
+        system.assert(allRequests.size() == 300);
+    }
 }
