@@ -4,7 +4,7 @@ public with sharing class MaintenanceRequestHelper {
         
         
         // Listing all Repair and Routine Maintenance cases
-        For (Case c : updWorkOrders){
+        for (Case c : updWorkOrders){
             if (nonUpdCaseMap.get(c.Id).Status != 'Closed' && c.Status == 'Closed'){
                 if (c.Type == 'Repair' || c.Type == 'Routine Maintenance'){
                     validIds.add(c.Id);
@@ -48,8 +48,19 @@ public with sharing class MaintenanceRequestHelper {
         }
         
        insert newCases;
-            
-            
+
+       List<Equipment_Maintenance_Item__c> clonedWPs = new List<Equipment_Maintenance_Item__c>();
+           for (Case nc : newCases){
+                for (Equipment_Maintenance_Item__c wp : closedCasesM.get(nc.ParentId).Equipment_Maintenance_Items__r){
+                    Equipment_Maintenance_Item__c wpClone = wp.clone();
+                    wpClone.Maintenance_Request__c = nc.Id;
+                    ClonedWPs.add(wpClone);
+                    
+                }
+            }
+        
+        insert ClonedWPs;
+               
         }
     }
 }
