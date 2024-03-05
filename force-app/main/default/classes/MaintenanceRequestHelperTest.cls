@@ -37,4 +37,42 @@ public with sharing class MaintenanceRequestHelperTest {
                                                                             Maintenance_Request__c = requestId);
         return wp;
     }
+
+    
+    @istest
+    private static void testMaintenanceRequestPositive(){
+        Vehicle__c vehicle = createVehicle();
+        insert vehicle;
+        id vehicleId = vehicle.Id;
+        
+        Product2 equipment = createEq();
+        insert equipment;
+        id equipmentId = equipment.Id;
+        
+        case somethingToUpdate = createMaintenanceRequest(vehicleId,equipmentId);
+        insert somethingToUpdate;
+        
+        Equipment_Maintenance_Item__c workP = createWorkPart(equipmentId,somethingToUpdate.id);
+        insert workP;
+        
+        test.startTest();
+        somethingToUpdate.status = CLOSED;
+        update somethingToUpdate;
+        test.stopTest();
+        
+        Case newReq = [Select id, subject, type, Equipment__c, Date_Reported__c, Vehicle__c, Date_Due__c
+                      from case
+                      where status =:STATUS_NEW];
+        
+        Equipment_Maintenance_Item__c workPart = [select id
+                                                 from Equipment_Maintenance_Item__c
+                                                 where Maintenance_Request__c =:newReq.Id];
+        
+        system.assert(workPart != null);
+        system.assert(newReq.Subject != null);
+        system.assertEquals(newReq.Type, REQUEST_TYPE);
+        SYSTEM.assertEquals(newReq.Equipment__c, equipmentId);
+        SYSTEM.assertEquals(newReq.Vehicle__c, vehicleId);
+        SYSTEM.assertEquals(newReq.Date_Reported__c, system.today());
+    }
 }
