@@ -19,6 +19,7 @@ public with sharing class WarehouseCalloutService implements Queueable{
             
             List<Product2> warehouseEquipments = new List<Product2>;
             
+            //Response handling
             if (response.getStatusCode == 200) {
                 List<Object> jsonResponse = (List<Object>) JSON.deserializeUntyped(response.getBody());
                 System.debug(response.getBody());
