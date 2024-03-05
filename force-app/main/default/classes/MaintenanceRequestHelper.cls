@@ -24,6 +24,30 @@ public with sharing class MaintenanceRequestHelper {
         for (AggregateResult ar : results){ 
             maintenanceCycles.put((Id) ar.get('Maintenance_Request__c'), (Decimal) ar.get('cycle'));
         }
+
+        for(Case cc : closedCasesM.values()){
+            Case nc = new Case (
+                ParentId = cc.Id,
+            Status = 'New',
+                Subject = 'Routine Maintenance',
+                Type = 'Routine Maintenance',
+                Vehicle__c = cc.Vehicle__c,
+                Equipment__c =cc.Equipment__c,
+                Origin = 'Web',
+                Date_Reported__c = Date.Today()
+                
+            );
+            
+            If (maintenanceCycles.containskey(cc.Id)){
+                nc.Date_Due__c = Date.today().addDays((Integer) maintenanceCycles.get(cc.Id));
+            } else {
+                nc.Date_Due__c = Date.today().addDays((Integer) cc.Equipment__r.maintenance_Cycle__c);
+            }
+            
+            newCases.add(nc);
+        }
+        
+       insert newCases;
             
             
         }
