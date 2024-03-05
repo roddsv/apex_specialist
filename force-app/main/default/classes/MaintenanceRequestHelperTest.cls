@@ -75,4 +75,36 @@ public with sharing class MaintenanceRequestHelperTest {
         SYSTEM.assertEquals(newReq.Vehicle__c, vehicleId);
         SYSTEM.assertEquals(newReq.Date_Reported__c, system.today());
     }
+
+    @istest
+    private static void testMaintenanceRequestNegative(){
+        Vehicle__C vehicle = createVehicle();
+        insert vehicle;
+        id vehicleId = vehicle.Id;
+        
+        product2 equipment = createEq();
+        insert equipment;
+        id equipmentId = equipment.Id;
+        
+        case emptyReq = createMaintenanceRequest(vehicleId,equipmentId);
+        insert emptyReq;
+        
+        Equipment_Maintenance_Item__c workP = createWorkPart(equipmentId, emptyReq.Id);
+        insert workP;
+        
+        test.startTest();
+        emptyReq.Status = WORKING;
+        update emptyReq;
+        test.stopTest();
+        
+        list<case> allRequest = [select id 
+                                 from case];
+        
+        Equipment_Maintenance_Item__c workPart = [select id 
+                                                  from Equipment_Maintenance_Item__c 
+                                                  where Maintenance_Request__c = :emptyReq.Id];
+        
+        system.assert(workPart != null);
+        system.assert(allRequest.size() == 1);
+    }
 }
