@@ -22,5 +22,19 @@ public with sharing class MaintenanceRequestHelperTest {
         return equipment;
     }
     
+    PRIVATE STATIC Case createMaintenanceRequest(id vehicleId, id equipmentId){
+        case cs = new case(Type=REPAIR,
+                          Status=STATUS_NEW,
+                          Origin=REQUEST_ORIGIN,
+                          Subject=REQUEST_SUBJECT,
+                          Equipment__c=equipmentId,
+                          Vehicle__c=vehicleId);
+        return cs;
+    }
     
+    PRIVATE STATIC Equipment_Maintenance_Item__c createWorkPart(id equipmentId,id requestId){
+        Equipment_Maintenance_Item__c wp = new Equipment_Maintenance_Item__c(Equipment__c = equipmentId,
+                                                                            Maintenance_Request__c = requestId);
+        return wp;
+    }
 }
